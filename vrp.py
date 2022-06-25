@@ -38,9 +38,11 @@ def longueur_trajet(solution, num_traject):
     
     val = sorted(solution,key=takethird)
     
-    for item in solution:
+    for item in val:
         if item[2] == num_traject or (item[0] == 0 and item[1] == 0):
+            print(item)
             longueur += distance_between_coord(last_item,item)
+            print(longueur)
             last_item = item
     longueur += distance_between_coord(last_item, (0,0))
     return longueur
@@ -87,4 +89,4 @@ def recherche_tabou(solution_initiale, taille_tabou, iter_max):
     return meilleure_globale    
 
 
-print(longueur_trajet([(0, 0,1,0), (10, 5,1,2),(0,1,1,1), (8, 6,1,3)], 1))
+print(longueur_trajet([(0, 0,1,0), (1, 2,1,1),(2,5,1,2), (5, 1,1,3)], 1))
