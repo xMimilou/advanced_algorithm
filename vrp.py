@@ -73,7 +73,7 @@ def random_city() -> list[list[int]]:
     print(coordinates_cities)
     return coordinates_cities
 
-# TODO: Utile?
+# TODO: À implémenter!
 def alea_distance_bet_point(cities) -> list[list[int]]:
     '''
     Calculate the distance between 2 cities.
@@ -87,7 +87,10 @@ def alea_distance_bet_point(cities) -> list[list[int]]:
             if i == j:
                 list_distance.append(0)
             else:
-                list_distance.append(random.randint(0, 10))
+                # Si la valeur 
+                #
+                #
+                list_distance.append(random.randint(-1, 10))
         matrice.append(list_distance)
     return matrice
 
@@ -124,12 +127,12 @@ def distance_between_coord(coord_1: list[int], coord_2: list[int]) -> float:
     return math.sqrt(coord_x**2+coord_y**2)
 
 # TODO : Pas plutôt le quatrième ?
-def takethird(element: list[int]) -> int:
+def takefourth(element: list[int]) -> int:
     '''
     Return the 3rd element of a list.
 
     :param element: List of elements.
-    :return element[3]: 3rd element of the list.
+    :return element[3]: 4th element of the list.
 
     remplacer avec un dictionnaire?
     '''
@@ -146,7 +149,7 @@ def length_trip(solution: list[list[int]], num_traject: int) -> float:
     '''
     lenght: float = 0
     last_item: tuple[int] = (0, 0, 0, 0)
-    val = sorted(solution, key=takethird)
+    val = sorted(solution, key=takefourth)
 
     for item in val:
         if item[2] == num_traject or (item[0] == 0 and item[1] == 0):
@@ -177,7 +180,7 @@ def last_element(solution: list[list[int]], num) -> int:
     :param num: TODO c qwa ?
     :return element: Last element of the list. TODO Vraiment ? Pas plutôt le max ?
     '''
-    val = sorted(solution, key=takethird)
+    val = sorted(solution, key=takefourth)
     higher = 0
     for element in val:
         if element[2] == num:
@@ -210,26 +213,29 @@ def two_opt(cost_mat: list[list[float]], route: list[list[int]]) -> list[list[in
                     route = best
     return best
 
-def neighbourhood(solution: list[list[int]], num_cam) -> list[list[int]]:
+def neighbourhood(solution: list[list[int]], p_nbr_truck: int) -> list[list[int]]:
     '''
     Get the list of the neighbours.
 
     :param solution: List of elements.
-    :param num_cam: truck number TODO C qwa ?
+    :param p_nbr_truck: truck number
     :return list_neighbours: List of the neighbours.
+
+    TODO : enlever les last_element + gestion des camions mieux
+
     '''
     list_neighbours = []
     for k in range(len(solution)):
-        if (solution[k][2] == num_cam):
+        if (solution[k][2] == p_nbr_truck):
             if solution[k][2] == nbr_truck:
                 new_val = 1
             else:
                 new_val = solution[k][2] + 1
-            sol_val = ([solution[k][0], solution[k][1], new_val, 0])
+            sol_val = ([solution[k][0], solution[k][1], new_val, last_element(solution, p_nbr_truck)+1])
         else:
-            new_val = num_cam
+            new_val = p_nbr_truck
             sol_val = ([solution[k][0], solution[k][1], new_val,
-                       last_element(solution, num_cam)+1])
+                       last_element(solution, p_nbr_truck)+1])
 
         neighbour = solution[:k] + [sol_val] + solution[k+1:]
         list_neighbours.append(neighbour)
@@ -293,7 +299,7 @@ def display_result(solution: list[list[int]]) -> None:
 
     :param solution: Solution of the problem.
     '''
-    val = sorted(solution, key=takethird)
+    val = sorted(solution, key=takefourth)
     plt.title("Connected Scatterplot points with lines")
 
     # plot scatter plot with x and y data
@@ -319,8 +325,9 @@ def display_result(solution: list[list[int]]) -> None:
     plt.show()
 
 
-start = time.time()
+#print(alea_distance_bet_point(random_city()))
 
+start = time.time()
 random.seed(a=5)
 nb_starts = 50
 val_max: list[list[int]] = [[-Infinity, -Infinity, 1, 0]]
@@ -329,13 +336,10 @@ for iter in range(nb_starts):
     print(total_distance(val))
     print(val)
     if total_distance(val) < total_distance(val_max):
-
         val_max = val
         print(val_max)
     print(iter)
 display_result(val_max)
-
 end = time.time()
 elapsed = end - start
-
 print(f'Temps d\'exécution : {elapsed} ms')
