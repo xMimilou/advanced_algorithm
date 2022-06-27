@@ -3,7 +3,6 @@ from collections import deque
 import math
 from numpy import Infinity
 
-import soupsieve
 grid_size = 10
 nb_ville = 25
 nb_camion = 4
