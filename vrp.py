@@ -4,13 +4,13 @@ import math
 from numpy import Infinity
 import matplotlib.pyplot as plt
 import time
-grid_size = 100
+grid_size = 50
 
 # paramètre d'entré
 nb_ville = 25
 nb_camion = 4
-taille_tabou = 2000
-iter_max = 100000
+taille_tabou = 200
+iter_max = 1000
 
 
 pile_chemin = [0 for i in range(nb_camion)]
@@ -137,6 +137,22 @@ def last_element(sol, num):
                 higher = element[3]
     return higher
 
+def two_opt(cost_mat, route):
+    best = route
+    improved = True
+    while improved:
+        improved = False
+        for i in range(1, len(route) - 2):
+            for j in range(i + 1, len(route)):
+                if j - i == 1: continue  # changes nothing, skip then
+                new_route = route[:]    # Creates a copy of route
+                new_route[i:j] = route[j - 1:i - 1:-1]  # this is the 2-optSwap since j >= i we use -1
+                if cost(cost_mat, new_route) < cost(cost_mat, best):
+                    best = new_route
+                    improved = True
+                    route = best
+    return best
+
 
 """
 def voisinage(solution):
@@ -205,10 +221,10 @@ def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
     valeur_meilleure_globale = valeur_meilleure
 
     while (nb_iter < iter_max):
-        valeur_meilleure = Infinity
+        #valeur_meilleure = Infinity
 
         # on parcourt tous les voisins de la solution courante
-        for i in range(1, nb_camion):
+        for i in range(1, nb_camion+1):
             for voisin in voisinage2(solution_courante, i):
                 # print(voisin)
                 # print(solution_courante)
@@ -233,7 +249,7 @@ def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
 
         # on met à jour la liste tabou
         liste_tabou.append(solution_courante)
-
+    
     return meilleure_globale
 
 # print(alea_distance_bet_point(random_city()))
@@ -264,7 +280,6 @@ def display_result(solution):
         print(longueur_trajet(val,camion))
     print(total_distance(val))  
     plt.show()  
-    return x,y
 
 
 start = time.time()
@@ -272,13 +287,17 @@ start = time.time()
 
 random.seed(a=5)
 nb_starts = 20
-val_max: list[list[int]] = []
+val_max: list[list[int]] = [[-Infinity, -Infinity, 1, 0]]
 for iter in range (nb_starts):
     val = tabou_search(random_city(), taille_tabou, iter_max)
-    if total_distance(val) > total_distance(val_max):
+    print(total_distance(val))
+    print(val)
+    if total_distance(val) < total_distance(val_max):
+        
         val_max = val
+        print(val_max)
     print(iter)
-x,y = display_result(val)
+display_result(val_max)
 
 end = time.time()
 elapsed = end - start
