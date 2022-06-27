@@ -144,7 +144,7 @@ def length_trip(solution: list[list[int]], num_traject: int) -> float:
     :return distance: Distance of the trajectory.
     '''
     lenght: float = 0
-    last_item = (0, 0, 0, 0)
+    last_item: tuple[int] = (0, 0, 0, 0)
     val = sorted(solution, key=takethird)
 
     for item in val:
@@ -176,7 +176,7 @@ def last_element(solution: list[list[int]], num) -> int:
     :param num: TODO c qwa ?
     :return element: Last element of the list. TODO Vraiment ? Pas plutôt le max ?
     '''
-    val = sorted(sol, key=takethird)
+    val = sorted(solution, key=takethird)
     higher = 0
     for element in val:
         if element[2] == num:
