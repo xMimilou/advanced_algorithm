@@ -5,7 +5,6 @@ from numpy import Infinity
 from shapely.geometry import Point, LineString, Polygon
 
 
-
 grid_size = 10
 nb_ville = 25
 nb_camion = 4
@@ -16,6 +15,7 @@ pile_chemin = [0 for i in range(nb_camion)]
 random.seed(a=3)
 
 # ajouter une matrice double dimentionnel pour simuler le trafic sur une route entre deux points et l'appliquer en coef au calcule de distance.
+
 
 def random_city() -> list[list[int]]:
     '''
@@ -29,6 +29,7 @@ def random_city() -> list[list[int]]:
     print(coordinates_cities)
     return coordinates_cities
 
+
 def alea_distance_bet_point(cities) -> list[list[int]]:
     matrice = []
     for i in range(len(cities)):
@@ -37,9 +38,10 @@ def alea_distance_bet_point(cities) -> list[list[int]]:
             if i == j:
                 list_distance.append(0)
             else:
-                list_distance.append(random.randint(0,10))
+                list_distance.append(random.randint(0, 10))
         matrice.append(list_distance)
     return matrice
+
 
 def distance_between_all_coord(coordinates_cities: list[list[int]]) -> list[list[float]]:
     '''
@@ -79,7 +81,6 @@ def takethird(element: list):
     return element[3]
 
 
-
 def longueur_trajet(solution: list[list[int]], num_traject: int) -> float:
     '''
     Calculate the travel distance.
@@ -95,11 +96,13 @@ def longueur_trajet(solution: list[list[int]], num_traject: int) -> float:
     longueur += distance_between_coord(last_item, (0, 0))
     return longueur
 
+
 def total_distance(solution):
     total_lenght = 0
-    for i in range(1,nb_camion+1):
-        total_lenght += longueur_trajet(solution,i)
+    for i in range(1, nb_camion+1):
+        total_lenght += longueur_trajet(solution, i)
     return total_lenght
+
 
 def last_element(sol, num):
     val = sorted(sol, key=takethird)
@@ -109,6 +112,7 @@ def last_element(sol, num):
             if element[3] > higher:
                 higher = element[3]
     return higher
+
 
 """
 def voisinage(solution):
@@ -135,23 +139,25 @@ def voisinage(solution):
     return matrixe_voisin
 """
 
+
 def voisinage2(solution, num_cam):
     list_voisin = []
     for k in range(len(solution)):
-        #print(type(solution[k]))
+        # print(type(solution[k]))
         # un indice : on veut les états des k-1 premiers objets et des k+1 derniers objets
         # et l'état inverse de l'objet k (attention aux bornes du slicing)
         if (solution[k][2] == num_cam):
             if solution[k][2] == nb_camion:
-                new_val =  1
+                new_val = 1
             else:
-                new_val = solution[k][2] + 1 
-            sol_val = ([solution[k][0],solution[k][1],new_val,0])
+                new_val = solution[k][2] + 1
+            sol_val = ([solution[k][0], solution[k][1], new_val, 0])
         else:
             new_val = num_cam
-            sol_val = ([solution[k][0],solution[k][1],new_val,last_element(solution,num_cam)+1])
-    
-        voisin = solution[:k] + [sol_val] + solution[k+1:] #SOLUTION
+            sol_val = ([solution[k][0], solution[k][1], new_val,
+                       last_element(solution, num_cam)+1])
+
+        voisin = solution[:k] + [sol_val] + solution[k+1:]  # SOLUTION
         list_voisin.append(voisin)
     return list_voisin
 
@@ -178,18 +184,17 @@ def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
         valeur_meilleure = Infinity
 
         # on parcourt tous les voisins de la solution courante
-        for i in range(1,nb_camion):
-            for voisin in voisinage2(solution_courante,i):
-                #print(voisin)
-                #print(solution_courante)
+        for i in range(1, nb_camion):
+            for voisin in voisinage2(solution_courante, i):
+                # print(voisin)
+                # print(solution_courante)
                 valeur_voisin = total_distance(voisin)
-                #print(valeur_voisin)
-                #print(valeur_meilleure)
+                # print(valeur_voisin)
+                # print(valeur_meilleure)
                 # MaJ meilleure solution non taboue trouvée
                 if valeur_voisin < valeur_meilleure and voisin not in liste_tabou:
                     valeur_meilleure = valeur_voisin
                     meilleure = voisin
-        
 
         # on met à jour la meilleure solution rencontrée depuis le début
         if valeur_meilleure < valeur_meilleure_globale:
@@ -207,23 +212,23 @@ def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
 
     return meilleure_globale
 
-#print(alea_distance_bet_point(random_city()))
+# print(alea_distance_bet_point(random_city()))
+
 
 def display_result(solution):
     val = sorted(solution, key=takethird)
-    for camion in range(1,nb_camion+1):
-        print("Camion numéro : "+ str(camion))
+    for camion in range(1, nb_camion+1):
+        print("Camion numéro : " + str(camion))
         for item in val:
-            
+
             if (item[2] == camion):
                 print(str(item) + " -> ", end='')
         print("")
-        print(longueur_trajet(val,camion))
-    print(total_distance(val))    
-    
+        print(longueur_trajet(val, camion))
+    print(total_distance(val))
 
 
-val = tabou_search(random_city(),taille_tabou,iter_max)
+val = tabou_search(random_city(), taille_tabou, iter_max)
 print("ksdgfhlomkfjeqghlgthlkghltighdslkgfjmklefshkghgsmldthmsklgnsùhtjymzojgtldqrjtùezrflkqsjukwùdr")
 
 display_result(val)
