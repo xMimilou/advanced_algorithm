@@ -184,10 +184,17 @@ def last_element(solution: list[list[int]], num) -> int:
                 higher = element[3]
     return higher
 
+# TODO: À implémenter
+# TODO: Réadapter pour la structure (x, y, p, n) ou optimiser avec une matrice de poids
+def two_opt(cost_mat: list[list[float]], route: list[list[int]]) -> list[list[int]]:
+    '''
+    Implement the 2-opt algorithm.
 
-''' TODO: À implémenter
-def two_opt(cost_mat, route):
-    best = route
+    :param cost_mat: Matrix of the distance between 2 cities.
+    :param route: List of cities defining a route to test.
+    :return route: Solution of the problem.
+    '''
+    best: list[list[int]] = route
     improved = True
     while improved:
         improved = False
@@ -196,13 +203,11 @@ def two_opt(cost_mat, route):
                 if j - i == 1: continue  # changes nothing, skip then
                 new_route = route[:]    # Creates a copy of route
                 new_route[i:j] = route[j - 1:i - 1:-1]  # this is the 2-optSwap since j >= i we use -1
-                if cost(cost_mat, new_route) < cost(cost_mat, best):
+                if length_trip(cost_mat, new_route) < length_trip(cost_mat, best): #TODO: Pour l'instant pas la bonne structure de données.
                     best = new_route
                     improved = True
                     route = best
     return best
-'''
-
 
 def neighbourhood(solution: list[list[int]], num_cam) -> list[list[int]]:
     '''
