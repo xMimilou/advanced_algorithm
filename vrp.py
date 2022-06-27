@@ -2,25 +2,42 @@ import random
 from collections import deque
 import math
 from numpy import Infinity
-from shapely.geometry import Point, LineString, Polygon
 import matplotlib.pyplot as plt
+import time
+grid_size = 100
 
-grid_size = 10
+# paramètre d'entré
 nb_ville = 25
 nb_camion = 4
+taille_tabou = 200
+iter_max = 100000
 
-taille_tabou = 500
-iter_max = 10000
+
 pile_chemin = [0 for i in range(nb_camion)]
-random.seed(a=3)
 
 list_color = {
     1 : "red",
     2 : "blue",
     3 : "green",
-    4 : "orange"
+    4 : "orange",
+    5 : "c",
+    6 : "m",
+    7 : "y",
+    8 : "purple",
+    9 : "k",
+    10 : "lime",
+    11 : "darkblue",
+    12 : "lavender",
+    13 : "blueviolet",
+    14 : "plum",
+    15 : "deeppink",
+    16 : "lightpink",
+    17 : "teal",
+    18 : "turquoise",
+    19 : "tan",
+    20 : "olive"
 }
-
+random.seed(a=3)
 # ajouter une matrice double dimentionnel pour simuler le trafic sur une route entre deux points et l'appliquer en coef au calcule de distance.
 
 
@@ -250,8 +267,14 @@ def display_result(solution):
     return x,y
 
 
+start = time.time()
+
+
 
 val = tabou_search(random_city(), taille_tabou, iter_max)
 x,y = display_result(val)
 
-  
+end = time.time()
+elapsed = end - start
+
+print(f'Temps d\'exécution : {elapsed} ms')
