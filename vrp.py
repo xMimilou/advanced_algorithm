@@ -2,6 +2,9 @@ import random
 from collections import deque
 import math
 from numpy import Infinity
+from shapely.geometry import Point, LineString, Polygon
+
+
 
 grid_size = 10
 nb_ville = 25
@@ -94,7 +97,7 @@ def longueur_trajet(solution: list[list[int]], num_traject: int) -> float:
 
 def total_distance(solution):
     total_lenght = 0
-    for i in range(1,4):
+    for i in range(1,nb_camion+1):
         total_lenght += longueur_trajet(solution,i)
     return total_lenght
 
