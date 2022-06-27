@@ -1,60 +1,78 @@
+'''
+:author: Mathilde BALLOUHEY
+:author: Tanguy DELANNOY
+:author: Louka MILLON
+:author: Maxime THOMAS
+
+:school: CESI Saint-Nazaire
+:year: 2022
+
+===============================================================
+:name: vrp.py
+
+:description: Solve the VRP problem via tabu search.
+TODO: Ajouter la contrainte de la distance.
+'''
+
 import random
 from collections import deque
 import math
 from numpy import Infinity
 import matplotlib.pyplot as plt
 import time
-grid_size = 50
 
-# paramètre d'entré
-nb_ville = 25
-nb_camion = 4
-taille_tabou = 200
+# Entry parameters
+grid_size = 50
+nbr_cities = 25
+nbr_truck = 4
+size_tabu = 200
 iter_max = 1000
 
+road_pile = [0 for i in range(nbr_truck)]
 
-pile_chemin = [0 for i in range(nb_camion)]
-
+# Colors for the graph
 list_color = {
-    1 : "red",
-    2 : "blue",
-    3 : "green",
-    4 : "orange",
-    5 : "c",
-    6 : "m",
-    7 : "y",
-    8 : "purple",
-    9 : "k",
-    10 : "lime",
-    11 : "darkblue",
-    12 : "lavender",
-    13 : "blueviolet",
-    14 : "plum",
-    15 : "deeppink",
-    16 : "lightpink",
-    17 : "teal",
-    18 : "turquoise",
-    19 : "tan",
-    20 : "olive"
+    1: "red",
+    2: "blue",
+    3: "green",
+    4: "orange",
+    5: "c",
+    6: "m",
+    7: "y",
+    8: "purple",
+    9: "k",
+    10: "lime",
+    11: "darkblue",
+    12: "lavender",
+    13: "blueviolet",
+    14: "plum",
+    15: "deeppink",
+    16: "lightpink",
+    17: "teal",
+    18: "turquoise",
+    19: "tan",
+    20: "olive"
 }
 random.seed(a=3)
-# ajouter une matrice double dimentionnel pour simuler le trafic sur une route entre deux points et l'appliquer en coef au calcule de distance.
-
 
 def random_city() -> list[list[int]]:
     '''
     Generate a random list of cities with coordinates.
 
-    Return a list with the city coordinates.
+    :return coordinates_cities: List of the coordinates of the cities.
     '''
     coordinates_cities = [(random.randint(-grid_size, grid_size), random.randint(
-        -grid_size, grid_size), random.randint(1, nb_camion), i) for i in range(nb_ville)]
+        -grid_size, grid_size), random.randint(1, nbr_truck), i) for i in range(nbr_cities)]
 
-    # print(coordinates_cities)
     return coordinates_cities
 
-
+# TODO: Utile?
 def alea_distance_bet_point(cities) -> list[list[int]]:
+    '''
+    Calculate the distance between 2 cities.
+
+    :param cities: List of cities. #TODO: Quel type?
+    '''
     matrice = []
     for i in range(len(cities)):
         list_distance = []
@@ -66,12 +84,13 @@ def alea_distance_bet_point(cities) -> list[list[int]]:
         matrice.append(list_distance)
     return matrice
 
-
+# TODO: Utile?
 def distance_between_all_coord(coordinates_cities: list[list[int]]) -> list[list[float]]:
     '''
     Calculate the distance between 2 cities.
 
-    Return a table of distance. The dimentions are the list of cities in order.
+    :param coordinates_cities: List of cities.
+    :return matrice: Matrix of the distance between 2 cities.
     '''
     table_distance_point = []
     for coord in coordinates_cities:
@@ -89,46 +108,68 @@ def distance_between_coord(coord_1: list[int], coord_2: list[int]) -> float:
     '''
     Calculate the distance between 2 coordonnates.
 
-    Return the result square root of the addition of the 2 coordonnates.
+    :param coord_1: Coordinates of the first point.
+    :param coord_2: Coordinates of the second point.
+    :return distance: Distance between the 2 points.
     '''
     coord_x = (coord_1[0]-coord_2[0])
     coord_y = (coord_1[1]-coord_2[1])
     return math.sqrt(coord_x**2+coord_y**2)
 
-
-def takethird(element: list):
+# TODO : Pas plutôt le quatrième ?
+def takethird(element: list[int]) -> int:
     '''
     Return the 3rd element of a list.
+
+    :param element: List of elements.
+    :return element[3]: 3rd element of the list.
 
     remplacer avec un dictionnaire?
     '''
     return element[3]
 
 
-def longueur_trajet(solution: list[list[int]], num_traject: int) -> float:
+def length_trip(solution: list[list[int]], num_traject: int) -> float:
     '''
     Calculate the travel distance.
+
+    :param solution: Solution of the problem.
+    :param num_traject: Number of the trajectory.
+    :return distance: Distance of the trajectory.
     '''
-    longueur: float = 0
+    lenght: float = 0
     last_item = (0, 0, 0, 0)
     val = sorted(solution, key=takethird)
 
     for item in val:
         if item[2] == num_traject or (item[0] == 0 and item[1] == 0):
-            longueur += distance_between_coord(last_item, item)
+            lenght += distance_between_coord(last_item, item)
             last_item = item
-    longueur += distance_between_coord(last_item, (0, 0))
-    return longueur
+    lenght += distance_between_coord(last_item, (0, 0))
+    return lenght
 
 
-def total_distance(solution):
+def total_distance(solution: list[list[int]]) -> float:
+    '''
+    Calculate the total distance of the solution.
+
+    :param solution: Solution of the problem.
+    :return distance: Total distance of the solution.
+    '''
     total_lenght = 0
-    for i in range(1, nb_camion+1):
-        total_lenght += longueur_trajet(solution, i)
+    for i in range(1, nbr_truck+1):
+        total_lenght += length_trip(solution, i)
     return total_lenght
 
+# TODO: Si sort pk chercher le max ? Voir si Python à un max sur une liste directement
+def last_element(solution: list[list[int]], num) -> int:
+    '''
+    Return the last element of a list.
 
-def last_element(sol, num):
+    :param solution: List of elements.
+    :param num: TODO c qwa ?
+    :return element: Last element of the list. TODO Vraiment ? Pas plutôt le max ?
+    '''
     val = sorted(sol, key=takethird)
     higher = 0
     for element in val:
@@ -137,6 +178,8 @@ def last_element(sol, num):
                 higher = element[3]
     return higher
 
+
+''' TODO: À implémenter
 def two_opt(cost_mat, route):
     best = route
     improved = True
@@ -152,42 +195,21 @@ def two_opt(cost_mat, route):
                     improved = True
                     route = best
     return best
+'''
 
 
-"""
-def voisinage(solution):
-    matrixe_voisin = []
-    for j in range(1,nb_camion+1):
-        list_voisin = []
-        for k in range(len(solution)):
-            #print(type(solution[k]))
-            # un indice : on veut les états des k-1 premiers objets et des k+1 derniers objets
-            # et l'état inverse de l'objet k (attention aux bornes du slicing)
-            if (solution[k][2] == j):
-                if solution[k][2] == nb_camion+1:
-                    new_val =  1
-                else:
-                    new_val = solution[k][2] + 1 
-                sol_val = ([solution[k][0],solution[k][1],new_val,0])
-            else:
-                new_val = j
-                sol_val = ([solution[k][0],solution[k][1],new_val,last_element(solution,j)+1])
-        
-            voisin = solution[:k] + [sol_val] + solution[k+1:] #SOLUTION
-            list_voisin.append(voisin)
-        matrixe_voisin.append(list_voisin)
-    return matrixe_voisin
-"""
+def neighbourhood(solution: list[list[int]], num_cam) -> list[list[int]]:
+    '''
+    Get the list of the neighbours.
 
-
-def voisinage2(solution, num_cam):
-    list_voisin = []
+    :param solution: List of elements.
+    :param num_cam: truck number TODO C qwa ?
+    :return list_neighbours: List of the neighbours.
+    '''
+    list_neighbours = []
     for k in range(len(solution)):
-        # print(type(solution[k]))
-        # un indice : on veut les états des k-1 premiers objets et des k+1 derniers objets
-        # et l'état inverse de l'objet k (attention aux bornes du slicing)
         if (solution[k][2] == num_cam):
-            if solution[k][2] == nb_camion:
+            if solution[k][2] == nbr_truck:
                 new_val = 1
             else:
                 new_val = solution[k][2] + 1
@@ -197,105 +219,105 @@ def voisinage2(solution, num_cam):
             sol_val = ([solution[k][0], solution[k][1], new_val,
                        last_element(solution, num_cam)+1])
 
-        voisin = solution[:k] + [sol_val] + solution[k+1:]  # SOLUTION
-        list_voisin.append(voisin)
-    return list_voisin
+        neighbour = solution[:k] + [sol_val] + solution[k+1:]
+        list_neighbours.append(neighbour)
+    return list_neighbours
 
 
-def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
+def tabu_search(initial_solution: list[list[int]], size_tabu: int, iter_max: int) -> list[list[int]]:
     '''
     Calculate the tabou search with max length and interation.
 
-    Return the best result for a tabou search
+    :param initial_solution: Initial solution of the problem.
+    :param size_tabu: Max length of the tabou list.
+    :param iter_max: Max iteration of the algorithm.
+    :return solution: Solution of the problem.
     '''
-    nb_iter: int = 0
-    liste_tabou = deque((), maxlen=taille_tabou)
+    nbr_iter: int = 0
+    list_tabu = deque((), maxlen=size_tabu)
 
-    # variables solutions pour la recherche du voisin optimal non tabou
-    solution_courante = solution_initiale
-    meilleure = solution_initiale
-    meilleure_globale = solution_initiale
+    # solution variables for the optimal neighbour search (no tabu)
+    current_solution = initial_solution
+    best = initial_solution
+    best_overrall = initial_solution
 
-    # variables valeurs pour la recherche du voisin optimal non tabou
-    valeur_meilleure = total_distance(solution_initiale)
-    valeur_meilleure_globale = valeur_meilleure
+    # values variables for the optimal neighbour search (no tabu)
+    value_best = total_distance(initial_solution)
+    value_best_overrall = value_best
 
-    while (nb_iter < iter_max):
-        #valeur_meilleure = Infinity
+    while (nbr_iter < iter_max):
 
-        # on parcourt tous les voisins de la solution courante
-        for i in range(1, nb_camion+1):
-            for voisin in voisinage2(solution_courante, i):
-                # print(voisin)
-                # print(solution_courante)
-                valeur_voisin = total_distance(voisin)
-                # print(valeur_voisin)
-                # print(valeur_meilleure)
-                # MaJ meilleure solution non taboue trouvée
-                ## TODO : faire une fonction qui utilise la fonction two opt
-                
-                if valeur_voisin < valeur_meilleure and voisin not in liste_tabou:
-                    valeur_meilleure = valeur_voisin
-                    meilleure = voisin
+        # look amoung all neighbours the current solution
+        for i in range(1, nbr_truck+1):
+            for neighbour in neighbourhood(current_solution, i):
+                value_neighbour = total_distance(neighbour)
+                # update best solution not tabu found
+                # TODO : faire une fonction qui utilise la fonction two opt
 
-        # on met à jour la meilleure solution rencontrée depuis le début
-        if valeur_meilleure < valeur_meilleure_globale:
-            meilleure_globale = meilleure
-            valeur_meilleure_globale = valeur_meilleure
-            nb_iter = 0
+                if value_neighbour < value_best and neighbour not in list_tabu:
+                    value_best = value_neighbour
+                    best = neighbour
+
+        # update best solution meet
+        if value_best < value_best_overrall:
+            best_overrall = best
+            value_best_overrall = value_best
+            nbr_iter = 0
         else:
-            nb_iter += 1
+            nbr_iter += 1
 
-        # on passe au meilleur voisin non tabou trouvé
-        solution_courante = meilleure
+        # current_solution takes value of best solution not tabfound
+        current_solution = best
 
-        # on met à jour la liste tabou
-        liste_tabou.append(solution_courante)
-    
-    return meilleure_globale
+        # update tabu list
+        list_tabu.append(current_solution)
 
-# print(alea_distance_bet_point(random_city()))
+    return best_overrall
 
 
-def display_result(solution):
+def display_result(solution: list[list[int]]) -> None:
+    '''
+    Display the solution of the problem.
+
+    :param solution: Solution of the problem.
+    '''
     val = sorted(solution, key=takethird)
     plt.title("Connected Scatterplot points with lines")
-  
+
     # plot scatter plot with x and y data
-    
-    for camion in range(1,nb_camion+1):
+
+    for truck in range(1, nbr_truck+1):
         x = [0]
         y = [0]
         plt.scatter(x, y)
-        print("Camion numéro : "+ str(camion))
-        print("(0, 0, 0, 0)"+ " -> ", end='')
+        print("Camion numéro : " + str(truck))
+        print("(0, 0, 0, 0)" + " -> ", end='')
         for item in val:
-            if (item[2] == camion):
+            if (item[2] == truck):
                 x.append(item[0])
                 y.append(item[1])
                 print(str(item) + " -> ", end='')
         print("(0, 0, 0, 0)")
         x.append(0)
         y.append(0)
-        plt.plot(x, y, label= "label "+ str(camion), color=list_color[camion])
+        plt.plot(x, y, label="label " + str(truck), color=list_color[truck])
         plt.legend()
-        print(longueur_trajet(val,camion))
-    print(total_distance(val))  
-    plt.show()  
+        print(length_trip(val, truck))
+    print(total_distance(val))
+    plt.show()
 
 
 start = time.time()
 
-
 random.seed(a=5)
 nb_starts = 50
 val_max: list[list[int]] = [[-Infinity, -Infinity, 1, 0]]
-for iter in range (nb_starts):
-    val = tabou_search(random_city(), taille_tabou, iter_max)
+for iter in range(nb_starts):
+    val = tabu_search(random_city(), size_tabu, iter_max)
     print(total_distance(val))
     print(val)
     if total_distance(val) < total_distance(val_max):
-        
+
         val_max = val
         print(val_max)
     print(iter)
