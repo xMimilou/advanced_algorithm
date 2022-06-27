@@ -2,8 +2,8 @@ import random
 from collections import deque
 import math
 from numpy import Infinity
-from shapely.geometry import Point, LineString, Polygon
-
+from ipywidgets import IntProgress
+from IPython.display import display
 
 grid_size = 10
 nb_ville = 25
@@ -26,7 +26,7 @@ def random_city() -> list[list[int]]:
     coordinates_cities = [(random.randint(-grid_size, grid_size), random.randint(
         -grid_size, grid_size), random.randint(1, nb_camion), i) for i in range(nb_ville)]
 
-    print(coordinates_cities)
+    # print(coordinates_cities)
     return coordinates_cities
 
 
@@ -227,8 +227,14 @@ def display_result(solution):
         print(longueur_trajet(val, camion))
     print(total_distance(val))
 
-
-val = tabou_search(random_city(), taille_tabou, iter_max)
+random.seed(a=5)
+nb_starts = 20
+val_max: list[list[int]] = []
+for iter in range (nb_starts):
+    val = tabou_search(random_city(), taille_tabou, iter_max)
+    if total_distance(val) > total_distance(val_max):
+        val_max = val
+    print(iter)
 print("ksdgfhlomkfjeqghlgthlkghltighdslkgfjmklefshkghgsmldthmsklgnsùhtjymzojgtldqrjtùezrflkqsjukwùdr")
 
 display_result(val)
