@@ -1,4 +1,10 @@
 '''
+:license:
+    BSD 3-Clause License
+
+    Copyright (c) 2022, xMimilou
+    All rights reserved.
+    
 :author: Mathilde BALLOUHEY
 :author: Tanguy DELANNOY
 :author: Louka MILLON
