@@ -232,6 +232,8 @@ def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
                 # print(valeur_voisin)
                 # print(valeur_meilleure)
                 # MaJ meilleure solution non taboue trouvée
+                ## TODO : faire une fonction qui utilise la fonction two opt
+                
                 if valeur_voisin < valeur_meilleure and voisin not in liste_tabou:
                     valeur_meilleure = valeur_voisin
                     meilleure = voisin
@@ -286,7 +288,7 @@ start = time.time()
 
 
 random.seed(a=5)
-nb_starts = 20
+nb_starts = 50
 val_max: list[list[int]] = [[-Infinity, -Infinity, 1, 0]]
 for iter in range (nb_starts):
     val = tabou_search(random_city(), taille_tabou, iter_max)
