@@ -2,18 +2,42 @@ import random
 from collections import deque
 import math
 from numpy import Infinity
-from ipywidgets import IntProgress
-from IPython.display import display
+import matplotlib.pyplot as plt
+import time
+grid_size = 100
 
-grid_size = 10
+# paramètre d'entré
 nb_ville = 25
 nb_camion = 4
+taille_tabou = 200
+iter_max = 100000
 
-taille_tabou = 50
-iter_max = 1000
+
 pile_chemin = [0 for i in range(nb_camion)]
-random.seed(a=3)
 
+list_color = {
+    1 : "red",
+    2 : "blue",
+    3 : "green",
+    4 : "orange",
+    5 : "c",
+    6 : "m",
+    7 : "y",
+    8 : "purple",
+    9 : "k",
+    10 : "lime",
+    11 : "darkblue",
+    12 : "lavender",
+    13 : "blueviolet",
+    14 : "plum",
+    15 : "deeppink",
+    16 : "lightpink",
+    17 : "teal",
+    18 : "turquoise",
+    19 : "tan",
+    20 : "olive"
+}
+random.seed(a=3)
 # ajouter une matrice double dimentionnel pour simuler le trafic sur une route entre deux points et l'appliquer en coef au calcule de distance.
 
 
@@ -217,15 +241,34 @@ def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
 
 def display_result(solution):
     val = sorted(solution, key=takethird)
-    for camion in range(1, nb_camion+1):
-        print("Camion numéro : " + str(camion))
+    plt.title("Connected Scatterplot points with lines")
+  
+    # plot scatter plot with x and y data
+    
+    for camion in range(1,nb_camion+1):
+        x = [0]
+        y = [0]
+        plt.scatter(x, y)
+        print("Camion numéro : "+ str(camion))
+        print("(0, 0, 0, 0)"+ " -> ", end='')
         for item in val:
-
             if (item[2] == camion):
+                x.append(item[0])
+                y.append(item[1])
                 print(str(item) + " -> ", end='')
-        print("")
-        print(longueur_trajet(val, camion))
-    print(total_distance(val))
+        print("(0, 0, 0, 0)")
+        x.append(0)
+        y.append(0)
+        plt.plot(x, y, label= "label "+ str(camion), color=list_color[camion])
+        plt.legend()
+        print(longueur_trajet(val,camion))
+    print(total_distance(val))  
+    plt.show()  
+    return x,y
+
+
+start = time.time()
+
 
 random.seed(a=5)
 nb_starts = 20
@@ -235,6 +278,9 @@ for iter in range (nb_starts):
     if total_distance(val) > total_distance(val_max):
         val_max = val
     print(iter)
-print("ksdgfhlomkfjeqghlgthlkghltighdslkgfjmklefshkghgsmldthmsklgnsùhtjymzojgtldqrjtùezrflkqsjukwùdr")
+x,y = display_result(val)
 
-display_result(val)
+end = time.time()
+elapsed = end - start
+
+print(f'Temps d\'exécution : {elapsed} ms')
