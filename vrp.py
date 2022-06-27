@@ -61,6 +61,7 @@ list_color = {
 }
 random.seed(a=3)
 
+#TODO: Pas de voisinage ? C'est normal ?
 def random_city() -> list[list[int]]:
     '''
     Generate a random list of cities with coordinates.
@@ -69,7 +70,7 @@ def random_city() -> list[list[int]]:
     '''
     coordinates_cities = [(random.randint(-grid_size, grid_size), random.randint(
         -grid_size, grid_size), random.randint(1, nbr_truck), i) for i in range(nbr_cities)]
-
+    print(coordinates_cities)
     return coordinates_cities
 
 # TODO: Utile?
