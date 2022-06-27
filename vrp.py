@@ -3,17 +3,24 @@ from collections import deque
 import math
 from numpy import Infinity
 from shapely.geometry import Point, LineString, Polygon
-
+import matplotlib.pyplot as plt
 
 
 grid_size = 10
 nb_ville = 25
 nb_camion = 4
 
-taille_tabou = 50
-iter_max = 1000
+taille_tabou = 500
+iter_max = 10000
 pile_chemin = [0 for i in range(nb_camion)]
 random.seed(a=3)
+
+list_color = {
+    1 : "red",
+    2 : "blue",
+    3 : "green",
+    4 : "orange"
+}
 
 # ajouter une matrice double dimentionnel pour simuler le trafic sur une route entre deux points et l'appliquer en coef au calcule de distance.
 
@@ -211,19 +218,37 @@ def tabou_search(solution_initiale, taille_tabou: int, iter_max: int):
 
 def display_result(solution):
     val = sorted(solution, key=takethird)
-    for camion in range(1,nb_camion+1):
-        print("Camion numéro : "+ str(camion))
-        for item in val:
-            
-            if (item[2] == camion):
-                print(str(item) + " -> ", end='')
-        print("")
-        print(longueur_trajet(val,camion))
-    print(total_distance(val))    
+    plt.title("Connected Scatterplot points with lines")
+  
+    # plot scatter plot with x and y data
     
+    for camion in range(1,nb_camion+1):
+        x = [0]
+        y = [0]
+        plt.scatter(x, y)
+        print("Camion numéro : "+ str(camion))
+        print("(0, 0, 0, 0)"+ " -> ", end='')
+        for item in val:
+            if (item[2] == camion):
+                x.append(item[0])
+                y.append(item[1])
+                print(str(item) + " -> ", end='')
+        print("(0, 0, 0, 0)")
+        x.append(0)
+        y.append(0)
+        plt.plot(x, y, label= "label "+ str(camion), color=list_color[camion])
+        plt.legend()
+        print(longueur_trajet(val,camion))
+    print(total_distance(val))  
+    plt.show()  
+    return x,y
 
 
 val = tabou_search(random_city(),taille_tabou,iter_max)
 print("ksdgfhlomkfjeqghlgthlkghltighdslkgfjmklefshkghgsmldthmsklgnsùhtjymzojgtldqrjtùezrflkqsjukwùdr")
 
-display_result(val)
+x,y = display_result(val)
+
+  
+# plot with x and y data
+
