@@ -9,7 +9,7 @@ grid_size = 100
 # paramètre d'entré
 nb_ville = 25
 nb_camion = 4
-taille_tabou = 200
+taille_tabou = 2000
 iter_max = 100000
 
 
