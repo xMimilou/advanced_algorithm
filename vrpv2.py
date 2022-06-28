@@ -317,7 +317,7 @@ def display_result(p_solution) -> None:
         print("(0, 0, 0, 0)")
         x.append(0)
         y.append(0)
-        plt.plot(x, y, label="label " + str(truck), color=list_color[truck])
+        plt.plot(x, y, label="label " + str(truck), markers ="o", color=list_color[truck])
         plt.legend()
         
     print(f" my solution : {p_solution}")
