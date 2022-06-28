@@ -221,7 +221,7 @@ pickup_delivery_time_in = [[0, 0, 0],
 
 number_of_vehicle: int = 8
 number_of_cities: int = 20
-tabu_itrs: int = 40
+tabu_itrs: int = 100
 aspiration: int = 100
 sn = 0
 retention: int = 7
@@ -256,7 +256,7 @@ def adj_matrix_generator(coordinates_cities: dict) -> dict:
     '''
 
     b = np.random.choice((True, False), size=(
-        number_of_cities, number_of_cities), p=[0.4, 0.6])
+        number_of_cities, number_of_cities), p=[1, 0])
     b_symm = np.logical_or(b, b.T)
 
     matrix = b_symm.astype(int)
@@ -313,7 +313,7 @@ def get_cost(p_previous: int, p_next: int, p_service_start_time_previous: int, p
     # Time to make a service at previous node
     pickup_delivery = sum(
         pickup_delivery_time_in[p_previous]) if not p_is_delayed_previous else 0
-    # Time to make a service at next node
+    # Time to make a service at next node, check if it has time to make a service before closing of the time window (service_time_in[p_next][1])
     delay_time = p_service_start_time_previous + pickup_delivery + distance_traveled - \
         service_time_in[p_next][1] if p_service_start_time_previous + pickup_delivery + \
         distance_traveled - service_time_in[p_next][1] > 0 else 0
@@ -838,10 +838,14 @@ def print_log(log: str) -> None:
 # log = open("myprog.log", "a")
 # sys.stdout = log
 
-# read_input_file("vrptw_test_4_nodes.txt")
+# Generate distance matrix
 test = random_city()
 matrice = adj_matrix_generator(test)
-distance_matrix_generator(matrice, test)
+distance_mtrx = distance_matrix_generator(matrice, test)
+en = len(distance_mtrx) - 1
+unserviced = list(range(1, en + 1))
+
+# Launch the algorithm
 routes = get_initial_solution()
 print("Best solution: {0}".format(routes))
 # routes.remove([])
