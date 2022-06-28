@@ -31,8 +31,8 @@ import time
 grid_size = 50
 nbr_cities = 25
 nbr_truck = 4
-size_tabu = 200
-iter_max = 1000
+size_tabu = 800
+iter_max = 20000
 
 road_pile = [0 for i in range(nbr_truck)]
 
@@ -72,6 +72,8 @@ def random_city() -> list[list[int]]:
         -grid_size, grid_size), random.randint(1, nbr_truck), i) for i in range(nbr_cities)]
     print(coordinates_cities)
     return coordinates_cities
+
+
 
 # TODO: À implémenter!
 def alea_distance_bet_point(cities) -> list[list[int]]:
@@ -213,6 +215,20 @@ def two_opt(cost_mat: list[list[float]], route: list[list[int]]) -> list[list[in
                     route = best
     return best
 
+def truck_reorder(solution, num_truck):
+    '''
+    Reorder the solution.
+
+    :param solution: Solution of the problem.
+    :param num_truck: Number of the trajectory.
+    :return solution: Solution of the problem.
+    '''
+    solution_reorder = []
+    for item in solution:
+        if item[2] == num_truck:
+            solution_reorder.append(item)
+    return solution_reorder
+
 def neighbourhood(solution: list[list[int]], p_nbr_truck: int) -> list[list[int]]:
     '''
     Get the list of the neighbours.
@@ -226,6 +242,7 @@ def neighbourhood(solution: list[list[int]], p_nbr_truck: int) -> list[list[int]
     '''
     list_neighbours = []
     for k in range(len(solution)):
+        
         if (solution[k][2] == p_nbr_truck):
             if solution[k][2] == nbr_truck:
                 new_val = 1
@@ -263,6 +280,10 @@ def tabu_search(initial_solution: list[list[int]], size_tabu: int, iter_max: int
     value_best = total_distance(initial_solution)
     value_best_overrall = value_best
 
+    # analyse statistics de la recherche tabu
+    courantes = []
+    meilleures_courantes = []
+
     while (nbr_iter < iter_max):
 
         # look amoung all neighbours the current solution
@@ -283,14 +304,15 @@ def tabu_search(initial_solution: list[list[int]], size_tabu: int, iter_max: int
             nbr_iter = 0
         else:
             nbr_iter += 1
-
+        meilleures_courantes.append(value_best_overrall)
+        courantes.append(value_best)
         # current_solution takes value of best solution not tabfound
         current_solution = best
 
         # update tabu list
         list_tabu.append(current_solution)
 
-    return best_overrall
+    return best_overrall, courantes , meilleures_courantes
 
 
 def display_result(solution: list[list[int]]) -> None:
@@ -327,6 +349,17 @@ def display_result(solution: list[list[int]]) -> None:
 
 #print(alea_distance_bet_point(random_city()))
 
+val, courants, meilleurs_courants = tabu_search(random_city(), size_tabu, iter_max)
+
+print(courants)
+print(meilleurs_courants)
+plt.xlabel("nb itérations", fontsize=16)
+plt.ylabel("valeur", fontsize=16)
+plt.legend()
+plt.plot(range(len(courants)), courants)
+plt.plot(range(len(courants)), meilleurs_courants)
+plt.show()
+'''
 start = time.time()
 random.seed(a=5)
 nb_starts = 50
@@ -343,3 +376,5 @@ display_result(val_max)
 end = time.time()
 elapsed = end - start
 print(f'Temps d\'exécution : {elapsed} ms')
+'''
+
