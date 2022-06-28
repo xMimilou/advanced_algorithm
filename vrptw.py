@@ -1,8 +1,12 @@
-import sys
 from itertools import combinations
 import copy
+import numpy as np
+import random
+import math
+import matplotlib.pyplot as plt
+from scipy import rand
 
-from numpy import Infinity
+random.seed(a=3)
 
 distance_mtrx = [
     [0, 14, 4, 5, 22, 6, 7, 9, 7, 7, 2, 13, 15, 12, 11, 17, 11, 4, 18, 9, 8, 10, 9, 25, 11, 20, 19, 23, 32, 21, 29, 34,
@@ -217,6 +221,7 @@ pickup_delivery_time_in = [[0, 0, 0],
                            [0, 0, 0]]
 
 number_of_vehicle: int = 8
+number_of_cities: int = 20
 tabu_itrs: int = 40
 aspiration: int = 100
 sn = 0
@@ -225,6 +230,62 @@ en = len(distance_mtrx) - 1
 unserviced = list(range(1, en + 1))
 tabu_list = []
 logging = False
+grid_size: int = 99
+
+
+# -------------------------------------------create random point---------------------------------------------------------------------------
+def random_city() -> list:
+    '''
+    Generate a random list of cities with coordinates.
+
+    :return coordinates_cities: List of the coordinates of the cities.
+    '''
+    coordinates_cities = {}
+    for i in range(number_of_cities):
+        coordinates_cities[i] = [random.randint(
+            0, grid_size), random.randint(0, grid_size)]
+    print(coordinates_cities)
+    return coordinates_cities
+
+
+def adj_matrix_generator(coordinates_cities: dict) -> dict:
+    '''
+    Generate the adjacency matrix of the cities.
+
+    :param coordinates_cities: List of the coordinates of the cities.
+    :return adj_matrix: Adjacency matrix of the cities.
+    '''
+
+    b = np.random.choice((True, False), size=(
+        number_of_cities, number_of_cities), p=[0.4, 0.6])
+    b_symm = np.logical_or(b, b.T)
+
+    matrix = b_symm.astype(int)
+    for i in range(len(matrix)):
+        if(matrix[i][i] == 1):
+            matrix[i][i] = 0
+
+    print(matrix)
+    return matrix
+
+
+def distance_matrix_generator(matrix: list[list], coordinates_cities: dict) -> list:
+    '''
+    Generate the distance matrix of the cities.
+
+    :param matrix: Adjacency matrix of the cities.
+    :param coordinates_cities: List of the coordinates of the cities.
+    :return distance_matrix: Distance matrix of the cities.
+    '''
+    distance_matrix = []
+    for i in range(number_of_cities-1):
+        distance_matrix_line = []
+        for j in range(number_of_cities-1):
+            distance_matrix_line.append(math.sqrt((coordinates_cities[i][0] - coordinates_cities[j][0]) ** 2 + (
+                coordinates_cities[i][1] - coordinates_cities[j][1]) ** 2))
+        distance_matrix.append(distance_matrix_line)
+    print(distance_matrix)
+    return distance_matrix
 
 
 def remove_us(c):
@@ -283,7 +344,7 @@ def get_initial_solution() -> list[list[int]]:
         route = [0]
 
         while not prev == en:
-            minim = Infinity
+            minim = np.Infinity
             for c in unserviced:
                 if prev == en:
                     break
@@ -772,6 +833,9 @@ def print_log(log):
 # sys.stdout = log
 
 # read_input_file("vrptw_test_4_nodes.txt")
+test = random_city()
+matrice = adj_matrix_generator(test)
+distance_matrix_generator(matrice, test)
 routes = get_initial_solution()
 print("Best solution: {0}".format(routes))
 # routes.remove([])
@@ -779,7 +843,14 @@ best_soln, best_cost = tabu_search(routes, tabu_itrs)
 print("solution is : {0} with costs : {1}".format(best_soln, best_cost))
 best_cost = get_solution_actual_cost(best_soln)
 index1 = 0
+
+plt.title("Best solution for VRPTW")
+
+
 for route in best_soln:
+    x = [0]
+    y = [0]
+    plt.scatter(x, y)
     print("Route{0} is: {1}".format(index1, route))
     index1 += 1
 
