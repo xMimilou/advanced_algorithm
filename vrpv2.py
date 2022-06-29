@@ -30,11 +30,12 @@ import matplotlib.pyplot as plt
 import time
 
 # Entry parameters
-grid_size = 50
-nbr_cities = 25
-nbr_truck = 5
-size_tabu = 20
-iter_max = 100
+grid_size = 1000
+nbr_cities = 200
+nbr_truck = 20
+size_tabu = 50
+iter_max = 300
+nb_starts = 50
 
 road_pile = [0 for i in range(nbr_truck)]
 
@@ -185,6 +186,11 @@ def neighbourhood(solution: list[list[int]]) -> list[list[int]]:
             copy_solution[camion].remove(i)
             #print(f"solution is : {solution}")
             #print(f"value sent and remove is : {i}")
+            for combo in test_pos(copy_solution[camion], i):
+                copy_solution[camion] = list(combo)
+                list_neighbours.append(copy.deepcopy(copy_solution))
+                #print(f"copy_solution camion : {copy_solution}")
+            copy_solution[camion].remove(i)
             if camion == nbr_truck:
                 
                 for combo in test_pos(copy_solution[1].copy(),i):
@@ -300,7 +306,7 @@ def display_result(p_solution) -> None:
     :param solution: Solution of the problem.
     '''
     
-    plt.title("Connected Scatterplot points with lines")
+    plt.title("Visualisation d'une solution pour le VRP")
 
     # plot scatter plot with x and y data
     print(p_solution)
@@ -317,7 +323,7 @@ def display_result(p_solution) -> None:
         print("(0, 0, 0, 0)")
         x.append(0)
         y.append(0)
-        plt.plot(x, y, label="label " + str(truck), markers ="o", color=list_color[truck])
+        plt.plot(x, y, label="camion " + str(truck), color=list_color[truck])
         plt.legend()
         
     print(f" my solution : {p_solution}")
@@ -333,16 +339,16 @@ val, courants, meilleurs_courants = tabu_search(solution_initiale, size_tabu, it
 display_result(val)
 #print(courants)
 #print(meilleurs_courants)
+plt.title("Evolution de la solution pour le VRP")
 plt.xlabel("nb itérations", fontsize=16)
-plt.ylabel("valeur", fontsize=16)
+plt.ylabel("distance", fontsize=16)
 plt.legend()
 plt.plot(range(len(courants)), courants)
 plt.plot(range(len(courants)), meilleurs_courants)
 plt.show()
 
 start = time.time()
-random.seed(a=5)
-nb_starts = 500
+
 val_max: list[list[int]] = {1 : [-1]}
 for iter in range(nb_starts):
     solution_initiale = generate_random_solution(truck_container(), coord_city)
