@@ -185,6 +185,11 @@ def neighbourhood(solution: list[list[int]]) -> list[list[int]]:
             copy_solution[camion].remove(i)
             #print(f"solution is : {solution}")
             #print(f"value sent and remove is : {i}")
+            for combo in test_pos(copy_solution[camion], i):
+                copy_solution[camion] = list(combo)
+                list_neighbours.append(copy.deepcopy(copy_solution))
+                #print(f"copy_solution camion : {copy_solution}")
+            copy_solution[camion].remove(i)
             if camion == nbr_truck:
                 
                 for combo in test_pos(copy_solution[1].copy(),i):
@@ -201,7 +206,7 @@ def neighbourhood(solution: list[list[int]]) -> list[list[int]]:
                     list_neighbours.append(copy_solution.copy())
 
             copy_solution = []
-    #print("neighbours are : ", list_neighbours)               
+    #print("neighbours are : ", list_neighbours)          
     return list_neighbours
     # for k in range(len(solution)):
         
@@ -317,7 +322,7 @@ def display_result(p_solution) -> None:
         print("(0, 0, 0, 0)")
         x.append(0)
         y.append(0)
-        plt.plot(x, y, label="label " + str(truck), markers ="o", color=list_color[truck])
+        plt.plot(x, y, label="label " + str(truck), color=list_color[truck])
         plt.legend()
         
     print(f" my solution : {p_solution}")
@@ -342,7 +347,7 @@ plt.show()
 
 start = time.time()
 random.seed(a=5)
-nb_starts = 500
+nb_starts = 100
 val_max: list[list[int]] = {1 : [-1]}
 for iter in range(nb_starts):
     solution_initiale = generate_random_solution(truck_container(), coord_city)
