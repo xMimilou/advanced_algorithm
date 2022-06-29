@@ -207,7 +207,7 @@ def neighbourhood(solution: list[list[int]]) -> list[list[int]]:
                     list_neighbours.append(copy_solution.copy())
 
             copy_solution = []
-    #print("neighbours are : ", list_neighbours)               
+    #print("neighbours are : ", list_neighbours)          
     return list_neighbours
     # for k in range(len(solution)):
         
@@ -348,7 +348,6 @@ plt.plot(range(len(courants)), meilleurs_courants)
 plt.show()
 
 start = time.time()
-
 val_max: list[list[int]] = {1 : [-1]}
 for iter in range(nb_starts):
     solution_initiale = generate_random_solution(truck_container(), coord_city)
