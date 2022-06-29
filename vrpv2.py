@@ -31,7 +31,7 @@ import time
 
 # Entry parameters
 grid_size = 1000
-nbr_cities = 200
+nbr_cities = 20
 nbr_truck = 20
 size_tabu = 50
 iter_max = 300
