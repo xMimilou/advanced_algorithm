@@ -5,7 +5,7 @@ import random
 import math
 import matplotlib.pyplot as plt
 
-random.seed(a=3)
+random.seed(a=5)
 
 distance_mtrx = [
     [0, 14, 4, 5, 22, 6, 7, 9, 7, 7, 2, 13, 15, 12, 11, 17, 11, 4, 18, 9, 8, 10, 9, 25, 11, 20, 19, 23, 32, 21, 29, 34,
@@ -221,12 +221,12 @@ pickup_delivery_time_in = [[0, 0, 0],
 
 number_of_vehicle: int = 8
 number_of_cities: int = 20
-tabu_itrs: int = 100
+tabu_itrs: int = 1000
 aspiration: int = 100
-sn = 0
+start_node = 0
 retention: int = 7
-en: int = len(distance_mtrx) - 1
-unserviced: list[int] = list(range(1, en + 1))
+end_node: int = len(distance_mtrx) - 1
+unserviced: list[int] = list(range(1, end_node + 1))
 tabu_list: list[list[int]] = []
 logging = False
 grid_size: int = 99
@@ -239,10 +239,11 @@ def random_city() -> list:
 
     :return coordinates_cities: List of the coordinates of the cities.
     '''
-    coordinates_cities = {}
-    for i in range(number_of_cities):
+    coordinates_cities = {0: [0, 0]}
+    for i in range(1, number_of_cities + 1):
         coordinates_cities[i] = [random.randint(
-            0, grid_size), random.randint(0, grid_size)]
+            -grid_size, grid_size), random.randint(-grid_size, grid_size)]
+    coordinates_cities[number_of_cities + 1] = [0, 0]
     print(coordinates_cities)
     return coordinates_cities
 
@@ -254,9 +255,8 @@ def adj_matrix_generator(coordinates_cities: dict) -> dict:
     :param coordinates_cities: List of the coordinates of the cities.
     :return adj_matrix: Adjacency matrix of the cities.
     '''
-
     b = np.random.choice((True, False), size=(
-        number_of_cities, number_of_cities), p=[1, 0])
+        number_of_cities + 2, number_of_cities + 2), p=[0.6, 0.4])
     b_symm = np.logical_or(b, b.T)
 
     matrix = b_symm.astype(int)
@@ -267,7 +267,6 @@ def adj_matrix_generator(coordinates_cities: dict) -> dict:
     print(matrix)
     return matrix
 
-
 def distance_matrix_generator(matrix: list[list], coordinates_cities: dict) -> list:
     '''
     Generate the distance matrix of the cities.
@@ -277,18 +276,21 @@ def distance_matrix_generator(matrix: list[list], coordinates_cities: dict) -> l
     :return distance_matrix: Distance matrix of the cities.
     '''
     distance_matrix = []
-    for i in range(number_of_cities-1):
+    for i in range(number_of_cities + 2):
         distance_matrix_line = []
-        for j in range(number_of_cities-1):
-            distance_matrix_line.append(math.sqrt((coordinates_cities[i][0] - coordinates_cities[j][0]) ** 2 + (
-                coordinates_cities[i][1] - coordinates_cities[j][1]) ** 2))
+        for j in range(number_of_cities + 2):
+            if matrix[i][j] == 1:
+                distance_matrix_line.append(math.sqrt((coordinates_cities[i][0] - coordinates_cities[j][0]) ** 2 + (
+                    coordinates_cities[i][1] - coordinates_cities[j][1]) ** 2))
+            else:
+                distance_matrix_line.append(0)
         distance_matrix.append(distance_matrix_line)
     print(distance_matrix)
     return distance_matrix
 
 
 def remove_us(c):
-    if c != en and c in unserviced:
+    if c != end_node and c in unserviced:
         unserviced.remove(c)
 
 
@@ -342,14 +344,14 @@ def get_initial_solution() -> list[list[int]]:
     while compt_vehicle in range(1, number_of_vehicle + 1):
         previous = 0
         route = [0]
-        while not previous == en:
+        while not previous == end_node:
             minim = np.Infinity
             for next in unserviced:
-                if previous == en:
+                if previous == end_node:
                     break
-                if previous == 0 and next == en:
+                if previous == 0 and next == end_node:
                     continue
-                if compt_vehicle == number_of_vehicle and len(unserviced) > 1 and next == en:
+                if compt_vehicle == number_of_vehicle and len(unserviced) > 1 and next == end_node:
                     continue
                 distance_traveled, wait_time, delay_time, cost, service_start_time, is_delayed = get_cost(
                     previous, next, startTime_prev, is_delayed_previous)
@@ -684,7 +686,7 @@ def tabu_search(p_routes: list[list[int]], p_iterations: int) -> tuple[list[list
             best_solution_ever_not_chaned_itr_count += 1
         print("best solution so far {0}".format(best_soln))
         iteration_update_tabu_list()
-
+    tabu_list = []
     return best_solution_ever, best_cost_ever
 
 
@@ -839,11 +841,11 @@ def print_log(log: str) -> None:
 # sys.stdout = log
 
 # Generate distance matrix
-test = random_city()
-matrice = adj_matrix_generator(test)
-distance_mtrx = distance_matrix_generator(matrice, test)
-en = len(distance_mtrx) - 1
-unserviced = list(range(1, en + 1))
+list_cities = random_city()
+matrice = adj_matrix_generator(list_cities)
+distance_mtrx = distance_matrix_generator(matrice, list_cities)
+end_node = len(distance_mtrx) - 1
+unserviced = list(range(1, end_node + 1))
 
 # Launch the algorithm
 routes = get_initial_solution()
@@ -856,13 +858,21 @@ index1 = 0
 
 plt.title("Best solution for VRPTW")
 
-
-for route in best_soln:
+print(list_cities)
+for index1, route in enumerate(best_soln):
+    print("Route{0} is: {1}".format(index1, route))
     x = [0]
     y = [0]
     plt.scatter(x, y)
-    print("Route{0} is: {1}".format(index1, route))
-    index1 += 1
+    for point in route:
+        x.append(list_cities[point][0])
+        y.append(list_cities[point][1])
+    x.append(0)
+    y.append(0)
+    plt.plot(x, y, label="Camion {0}".format(index1))
+    # plt.pause(0.5)  # pause for 0.5 second
+plt.legend()
+plt.show()
 
 distance, delay, wait, cost, serviced, unserviced, details = get_solution_cost(
     best_soln)
